@@ -208,30 +208,16 @@ st.divider()
 with st.expander("ℹ️ Upload Instructions"):
 
     st.markdown(
+```
         '''
 ### How to update the Vendor Registry
 
-1. Export the latest Vendor Registry.
+1. Export the file from https://www.vendors.gov.sg/UsefulReferences/MinStatuaryBoards.aspx
 2. Save the file in JSON format.
 3. Upload the JSON file using this Admin page.
 4. Click **Rebuild Index**.
 5. Wait for indexing to complete.
 6. Test the updated registry using the Chat Assistant.
 
-### Expected JSON structure
 
-The JSON file should be a list of records.
-
-```json
-[
-  {
-    "MINISTRY / STATUTORY BOARD": "URA - Urban Redevelopment Authority",
-    "DEPARTMENT": "URA74 - URA Info Sys (Security)",
-    "SUB-BUSINESS UNIT": "URA74 - URA Info Sys (Security)"
-  },
-  {
-    "MINISTRY / STATUTORY BOARD": "WSG - SWDA (former WSG)",
-    "DEPARTMENT": "WSG02 - Internal Audit Division",
-    "SUB-BUSINESS UNIT": "WSG02 - Internal Audit Division"
-  }
-]
+```
