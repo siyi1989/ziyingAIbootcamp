@@ -254,7 +254,7 @@ with st.sidebar:
         """
 Examples:
 - Which customer code should I use for CAA Finance?
-- Vendor says this is for airport operations. Which division should I bill?
+- I am billing airport operations. What is the code I should use for billing?
 - What is the likely billing department for procurement?
 - Which sub-business unit should I use for HR-related billing?
 """
