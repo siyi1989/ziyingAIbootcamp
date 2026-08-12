@@ -13,8 +13,26 @@ class LocalHashEmbeddings(Embeddings):
     def __init__(self, dimension: int = 128):
         self.dimension = dimension
 
-    def _normalize(self, text: str) -> str:
-        return re.sub(r"[^a-z0-9]+", " ", text.lower()).strip()
+def _normalize(self, text: str) -> str:
+    text = text.lower()
+
+    # Keep original customer code forms
+    original = text
+
+    # Add split version of alphanumeric codes
+    expanded = re.sub(
+        r"([a-z]+)(\d+)",
+        r"\1 \2",
+        text
+    )
+
+    combined = f"{original} {expanded}"
+
+    return re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        combined
+    ).strip()
 
     def _embed_text(self, text: str) -> List[float]:
         tokens = self._normalize(text).split()
