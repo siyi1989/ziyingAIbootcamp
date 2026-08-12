@@ -7,9 +7,8 @@ st.markdown(
 ### Project Scope
 
 The **Vendors@Gov Billing Assistant** is a Retrieval-Augmented Generation (RAG)
-solution designed to help officers identify the most appropriate organisation,
-department, customer code, or sub-business unit when processing vendor billing
-transactions in Vendors@Gov.
+solution designed to help external vendors identify the most appropriate organisation,
+department, customer code, or sub-business unit when submitting their einvoice in Vendors@Gov.
 
 The assistant searches information from the latest Vendor Registry uploaded by
 administrators and uses semantic search to recommend the most relevant billing
@@ -18,9 +17,9 @@ details based on the user's query.
 ### Objectives
 
 - Provide a fast and intuitive way for officers to identify the correct billing entity.
-- Reduce manual searching through large Vendor Registry files.
+- Reduce manual searching through large Vendor Registry files / Vendors@Gov portal.
 - Improve consistency in the use of customer codes and billing departments.
-- Assist users when vendors are unable to clearly identify the correct division or customer code.
+- Assist users when they are unable to clearly identify the correct division or customer code.
 - Provide a controlled process for administrators to maintain and update the Vendor Registry.
 
 ### Data Sources
@@ -56,7 +55,7 @@ Responsible for:
 Responsible for:
 
 - Searching for billing information
-- Identifying the appropriate organisation or department
+- Identifying the appropriate organisation or department 
 - Obtaining customer codes and sub-business unit information
 - Verifying billing details before submission in Vendors@Gov
 
