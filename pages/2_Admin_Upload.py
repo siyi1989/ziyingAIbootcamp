@@ -9,7 +9,9 @@ from utils.document_loader import (
     get_persistence_status,
 )
 
+
 require_login(allowed_roles=["Admin"])
+
 
 # ============================================================
 # PAGE HEADER
@@ -28,6 +30,7 @@ st.info(
     "reading the JSON file directly."
 )
 
+
 # ============================================================
 # QDRANT STATUS
 # ============================================================
@@ -44,16 +47,12 @@ if status.get("using_qdrant"):
         )
 
         if status.get("qdrant_collection_exists"):
-
-            st.caption(
-                "Vendor Registry collection detected."
-            )
+            st.caption("Vendor Registry collection detected.")
 
     else:
 
         st.warning(
-            "Qdrant Cloud is configured but the vector store "
-            "cannot be initialised."
+            "Qdrant Cloud is configured but the vector store cannot be initialised."
         )
 
         if status.get("qdrant_error"):
@@ -63,8 +62,8 @@ if status.get("using_qdrant"):
         f"""
 **Debug Information**
 
-- Collection Exists: {status.get('qdrant_collection_exists')}
-- Store Usable: {status.get('qdrant_store_usable')}
+- Collection Exists: {status.get("qdrant_collection_exists")}
+- Store Usable: {status.get("qdrant_store_usable")}
 """
     )
 
@@ -77,6 +76,7 @@ elif status.get("qdrant_configured"):
 
     if status.get("qdrant_error"):
         st.error(f"Qdrant error: {status['qdrant_error']}")
+
 
 # ============================================================
 # FILE UPLOAD
@@ -93,7 +93,6 @@ if uploaded_files:
     uploaded_count = 0
 
     for f in uploaded_files:
-
         save_uploaded_file(f)
         uploaded_count += 1
 
@@ -101,6 +100,7 @@ if uploaded_files:
         f"Successfully uploaded {uploaded_count} JSON file(s). "
         "Click 'Rebuild Index' to update the vector database."
     )
+
 
 # ============================================================
 # CURRENT FILES
@@ -120,18 +120,24 @@ if docs:
 
         col1.write(d)
 
-        if col2.button(
-            "🗑️ Delete",
-            key=f"delete_{idx}_{d}"
-        ):
+        if col2.button("🗑️ Delete", key=f"delete_{idx}_{d}"):
             delete_document(d)
             st.rerun()
 
 else:
 
-    st.info(
-        "No Vendor Registry files uploaded."
-    )
+    if status.get("using_qdrant") and status.get("qdrant_collection_exists"):
+
+        st.success(
+            "No local registry file is currently available in this session, "
+            "but a Qdrant collection exists remotely. The Chat Assistant may "
+            "still retrieve from the persisted vector data."
+        )
+
+    else:
+
+        st.info("No Vendor Registry files uploaded yet.")
+
 
 # ============================================================
 # REBUILD INDEX
@@ -142,27 +148,21 @@ st.divider()
 st.subheader("🔄 Vector Rebuild")
 
 st.caption(
-    "Rebuild the Vendor Registry collection after uploading "
-    "a new registry file."
+    "Rebuild the Vendor Registry collection after uploading a new registry file."
 )
 
-if st.button(
-    "🔄 Rebuild Index",
-    type="primary"
-):
+if st.button("🔄 Rebuild Index", type="primary"):
 
     progress_bar = st.progress(
         0,
-        text="Preparing documents..."
+        text="Preparing registry records..."
     )
 
-    def update_progress(
-        batch_num,
-        total_batches
-    ):
+    def update_progress(batch_num, total_batches):
+
         progress_bar.progress(
             batch_num / total_batches,
-            text=f"Embedding batch {batch_num} of {total_batches}"
+            text=f"Embedding batch {batch_num} of {total_batches}..."
         )
 
     try:
@@ -176,7 +176,8 @@ if st.button(
         if vs is None:
 
             st.warning(
-                "No registry files found for indexing."
+                "No registry files found for indexing. "
+                "Please upload a valid Vendor Registry JSON file first."
             )
 
         else:
@@ -186,7 +187,7 @@ if st.button(
             )
 
             st.info(
-                "The Chat Assistant will now use the latest Vendor Registry data."
+                "The Chat Assistant will now use the latest indexed Vendor Registry."
             )
 
     except Exception as ex:
@@ -197,6 +198,7 @@ if st.button(
             f"Index rebuild failed: {str(ex)}"
         )
 
+
 # ============================================================
 # INSTRUCTIONS
 # ============================================================
@@ -206,22 +208,30 @@ st.divider()
 with st.expander("ℹ️ Upload Instructions"):
 
     st.markdown(
-        """
+        '''
+### How to update the Vendor Registry
+
 1. Export the latest Vendor Registry.
-2. Save as JSON format.
-3. Upload the JSON file.
+2. Save the file in JSON format.
+3. Upload the JSON file using this Admin page.
 4. Click **Rebuild Index**.
 5. Wait for indexing to complete.
-6. Test retrieval in the Chat Assistant page.
+6. Test the updated registry using the Chat Assistant.
 
-Recommended JSON structure:
+### Expected JSON structure
+
+The JSON file should be a list of records.
 
 ```json
 [
   {
-    "organisation": "CAA",
-    "department": "Finance Division",
-    "customer_code": "CAA15",
-    "sub_business_unit": "CAA1501"
+    "MINISTRY / STATUTORY BOARD": "URA - Urban Redevelopment Authority",
+    "DEPARTMENT": "URA74 - URA Info Sys (Security)",
+    "SUB-BUSINESS UNIT": "URA74 - URA Info Sys (Security)"
+  },
+  {
+    "MINISTRY / STATUTORY BOARD": "WSG - SWDA (former WSG)",
+    "DEPARTMENT": "WSG02 - Internal Audit Division",
+    "SUB-BUSINESS UNIT": "WSG02 - Internal Audit Division"
   }
 ]
