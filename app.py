@@ -92,9 +92,8 @@ with st.sidebar:
 chat_page = st.Page("pages/1_Chat_Assistant.py", title="Chat Assistant", icon="💬", default=True)
 about_page = st.Page("pages/3_About_Us.py", title="About Us", icon="ℹ️")
 methodology_page = st.Page("pages/4_Methodology.py", title="Methodology", icon="🔍")
-fee_register_page = st.Page("pages/5_Fee_Register.py", title="Fee Register", icon="📊")
 
-pages = [chat_page, about_page, methodology_page, fee_register_page]
+pages = [chat_page, about_page, methodology_page]
 
 # ---------- Admin-only page: only added to the nav once logged in ----------
 if st.session_state.role == "Admin":
