@@ -209,7 +209,6 @@ with st.expander("ℹ️ Upload Instructions"):
 
     st.markdown(
 ```
-        '''
 ### How to update the Vendor Registry
 
 1. Export the file from https://www.vendors.gov.sg/UsefulReferences/MinStatuaryBoards.aspx
@@ -220,4 +219,4 @@ with st.expander("ℹ️ Upload Instructions"):
 6. Test the updated registry using the Chat Assistant.
 
 
-```
+```)
