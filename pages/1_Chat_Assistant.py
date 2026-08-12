@@ -18,7 +18,7 @@ st.caption(
 )
 
 st.write(
-    "Use this assistant when you're unclear about the Customer code. "
+    "Use this Vendors@Gov Billing assistant to find the billing details e.g. Customer Code."
     "The response is generated from the uploaded vendor registry and should "
     "be verified against the vendor's billing context before use."
 )
