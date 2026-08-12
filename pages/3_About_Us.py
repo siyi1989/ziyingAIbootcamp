@@ -16,7 +16,7 @@ details based on the user's query.
 
 ### Objectives
 
-- Provide a fast and intuitive way for officers to identify the correct billing entity.
+- Provide a fast and intuitive way for external vendors - both businesses and individuals to identify the correct billing entity.
 - Reduce manual searching through large Vendor Registry files / Vendors@Gov portal.
 - Improve consistency in the use of customer codes and billing departments.
 - Assist users when they are unable to clearly identify the correct division or customer code.
@@ -33,8 +33,8 @@ details based on the user's query.
 - 🔐 Role-based access control for Administrators
 - 📤 Admin upload and management of Vendor Registry files
 - 🔄 Rebuildable vector index using Qdrant
-- 💬 Natural language search across vendor billing records
-- 🎯 Suggestion of likely organisation, department, customer code, and sub-business unit
+- 💬 Natural language search across agencies' billing details
+- 🎯 Suggestion of likely organisation, department, customer code, or sub-business unit
 - 🕘 Session-based question history
 - 👍 User feedback collection for response quality monitoring
 - 🛡️ Input validation and prompt injection protection
