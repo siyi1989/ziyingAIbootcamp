@@ -1,81 +1,187 @@
 import streamlit as st
 import graphviz
 
-from utils.auth import require_login
-
-
 st.title("🔍 Methodology")
 
 st.markdown(
     """
-This app has two main use cases, each with its own data flow:
+This solution uses Retrieval-Augmented Generation (RAG) to help users identify
+the most appropriate organisation, department, customer code, or
+sub-business unit for vendor billing.
 
-1. **Document Ingestion & Indexing** (Admin)
-2. **Chat / Intelligent Search** (Admin & User)
+The solution has two main processes:
+
+1. **Vendor Registry Management** (Administrator)
+2. **Vendor Billing Search & Recommendation** (User)
 """
 )
 
-st.subheader("1️⃣ Document Ingestion & Indexing Flow")
+# ============================================================
+# ADMIN FLOW
+# ============================================================
+
+st.subheader("1️⃣ Vendor Registry Management")
+
 g1 = graphviz.Digraph()
 g1.attr(rankdir="LR")
-g1.node("A", "Admin uploads\nPDF / DOCX / TXT")
-g1.node("B", "File saved to\ndata/raw_docs/")
+
+g1.node("A", "Admin uploads\nVendor Registry JSON")
+g1.node("B", "JSON saved to\ndata folder")
 g1.node("C", "Admin clicks\n'Rebuild Index'")
-g1.node("D", "Documents parsed\n(PyPDFLoader / Docx2txtLoader / TextLoader)")
-g1.node("E", "Text split into\nchunks (1000 chars, 150 overlap)")
-g1.node("F", "Chunks embedded\n(OpenAI Embeddings)")
-g1.node("G", "FAISS index built &\nsaved to data/vector_store/")
-g1.edges(["AB", "BC", "CD", "DE", "EF", "FG"])
+g1.node("D", "Registry records\nparsed")
+g1.node("E", "Searchable text\nconstructed")
+g1.node("F", "Embeddings\ngenerated")
+g1.node("G", "Stored in\nQdrant Collection")
+
+g1.edges([
+    "AB",
+    "BC",
+    "CD",
+    "DE",
+    "EF",
+    "FG",
+])
+
 st.graphviz_chart(g1)
 
 st.markdown(
     """
-- **Upload:** Admin selects one or more documents via the file uploader.
-- **Storage:** Raw files are kept in `data/raw_docs/` so they can be
-  re-indexed or removed later.
-- **Chunking:** Long documents are split into overlapping chunks so relevant
-  sections can be retrieved precisely, even from long legislation.
-- **Embedding & Indexing:** Each chunk is converted to a vector embedding
-  and stored in a local FAISS index for fast similarity search.
+### Registry Upload
+
+Administrators upload the latest Vendor Registry in JSON format.
+
+### Registry Processing
+
+Each registry record is processed into searchable content containing information such as:
+
+- Organisation
+- Department
+- Customer Code
+- Sub-Business Unit
+- Keywords and descriptions
+
+### Embedding Generation
+
+The processed records are converted into vector embeddings.
+
+### Vector Storage
+
+Embeddings are stored in a Qdrant collection, enabling semantic search and persistence across application restarts.
 """
 )
 
-st.subheader("2️⃣ Chat / Intelligent Search Flow")
+# ============================================================
+# CHAT FLOW
+# ============================================================
+
+st.subheader("2️⃣ Vendor Billing Search & Recommendation")
+
 g2 = graphviz.Digraph()
 g2.attr(rankdir="LR")
-g2.node("H", "User types\na question")
-g2.node("I", "Input screened\n(prompt-injection check)")
-g2.node("J", "FAISS similarity\nsearch (top-k chunks)")
-g2.node("K", "Chunks wrapped as\n'context', not instructions")
-g2.node("L", "LLM answers using\nsystem prompt + context")
-g2.node("M", "Answer + cited\nsources shown to user")
-g2.node("N", "Saved to session\nquestion history")
-g2.edges(["HI", "IJ", "JK", "KL", "LM", "MN"])
+
+g2.node("H", "User enters\nbilling query")
+g2.node("I", "Input validation\nand screening")
+g2.node("J", "Question embedded")
+g2.node("K", "Qdrant semantic\nsearch")
+g2.node("L", "Relevant registry\nrecords retrieved")
+g2.node("M", "LLM analyses\nretrieved records")
+g2.node("N", "Recommended\nbilling details")
+g2.node("O", "Response shown\nto user")
+
+g2.edges([
+    "HI",
+    "IJ",
+    "JK",
+    "KL",
+    "LM",
+    "MN",
+    "NO",
+])
+
 st.graphviz_chart(g2)
 
 st.markdown(
     """
-- **Screening:** User input is checked against known prompt-injection
-  phrases before being sent to the retriever/LLM.
-- **Retrieval:** The question is embedded and compared against the FAISS
-  index to fetch the most relevant document chunks.
-- **Safe context wrapping:** Retrieved text is wrapped in explicit
-  `<document_excerpt>` tags, and the system prompt instructs the LLM to
-  treat it as reference data only — never as commands. This mitigates
-  indirect prompt injection hidden inside uploaded documents.
-- **Grounded answer:** The LLM is instructed to answer only from the
-  provided context and to cite the source document for every fact.
-- **History:** Each question/answer pair is stored in `st.session_state`
-  for the duration of the session and shown in the sidebar.
+### User Query
 
+Users may search using:
+
+- Organisation names
+- Department names
+- Customer codes
+- Business functions
+- Vendor descriptions
+- Billing requirements
+
+Example:
+
+> Vendor says the work relates to Finance Division. Which customer code should be used?
+
+### Retrieval
+
+The user's query is converted into an embedding and compared against Vendor Registry records stored in Qdrant.
+
+The most relevant records are retrieved based on semantic similarity rather than exact keyword matching.
+
+### Context Grounding
+
+Only the retrieved Vendor Registry records are provided to the Large Language Model (LLM).
+
+The LLM is instructed to:
+
+- Recommend likely matches
+- Explain the rationale
+- Present alternative matches where applicable
+- Avoid generating customer codes not found in the registry
+
+### Response Generation
+
+The assistant returns:
+
+- Recommended Organisation
+- Recommended Department
+- Customer Code (where available)
+- Sub-Business Unit (where available)
+- Alternative matches when confidence is lower
+
+### Security Controls
+
+- Input validation and sanitisation
+- Prompt injection screening
+- Grounded responses based on retrieved registry data
+- Administrator-controlled registry updates
+"""
+)
+
+# ============================================================
+# TECH STACK
+# ============================================================
+
+st.subheader("3️⃣ Technical Architecture")
+
+st.markdown(
+    """
 ### Tech Stack
+
 | Layer | Technology |
-|---|---|
-| UI | Streamlit (multi-page) |
+|---------|---------|
+| User Interface | Streamlit |
+| Authentication | Custom Role-Based Access |
 | Orchestration | LangChain |
-| Vector Store | FAISS |
-| Embeddings & LLM | OpenAI (`text-embedding-ada-002`, `gpt-4o-mini`) |
-| Document Parsing | PyPDF, docx2txt |
-| Deployment | Docker |
+| Vector Database | Qdrant |
+| Embeddings | OpenAI Embeddings |
+| Large Language Model | GPT-4o-mini |
+| Data Source | Vendor Registry JSON |
+| Storage | Qdrant + Local Data Folder |
+| Deployment | Docker / Streamlit Cloud |
+
+### RAG Workflow Summary
+
+1. Administrator uploads Vendor Registry.
+2. Registry records are embedded and stored in Qdrant.
+3. User submits a billing-related question.
+4. Relevant registry records are retrieved from Qdrant.
+5. The LLM generates recommendations using only retrieved records.
+6. The user receives a suggested organisation, department, customer code, or sub-business unit.
 """
 )
