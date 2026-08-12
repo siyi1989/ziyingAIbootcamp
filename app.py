@@ -7,13 +7,9 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
-# OpenAI API key is read directly from the OPENAI_API_KEY environment variable.
-if not os.getenv("OPENAI_API_KEY"):
-    st.warning("OPENAI_API_KEY is not set. The app will fail to generate responses until it is configured.")
-
 st.set_page_config(
-    page_title="CAAS Fees Legislation Assistant",
-    page_icon="✈️",
+    page_title="Vendors@Gov Billing Assistant",
+    page_icon="💬",
     layout="wide",
 )
 
@@ -24,14 +20,15 @@ with st.expander("⚠️ Required Disclaimer — Please Read", expanded=False):
 **IMPORTANT NOTICE:** This web application is developed as a proof-of-concept
 prototype. The information provided here is **NOT intended for actual usage**
 and should not be relied upon for making any decisions, especially those
-related to financial, legal, or healthcare matters.
+related to financial or billing matters.
 
-**Furthermore, please be aware that the LLM may generate inaccurate or
-incorrect information. You assume full responsibility for how you use any
-generated output.**
+**This assistant looks up records from a vendor data file and may return
+incomplete or incorrect results if the underlying data is outdated or
+mislabelled. You assume full responsibility for how you use any output
+generated here.**
 
-Always consult with qualified professionals for accurate and personalised
-advice.
+Always verify customer codes and billing details against the official
+Vendors@Gov system before use.
         """
     )
 
@@ -40,7 +37,6 @@ for key, default in {
     "authenticated": False,
     "role": None,
     "username": None,
-    "chat_history": [],
     "login_error": "",
 }.items():
     if key not in st.session_state:
@@ -74,7 +70,7 @@ def do_login():
     st.rerun()
 
 
-# ---------- Admin login lives in the sidebar so the main page can be chat ----------
+# ---------- Admin login lives in the sidebar ----------
 with st.sidebar:
     if not st.session_state.authenticated:
         with st.expander("🔐 Admin Login"):
@@ -92,17 +88,22 @@ with st.sidebar:
             st.session_state.username = None
             st.rerun()
 
-# ---------- Pages visible to everyone ----------
-chat_page = st.Page("pages/1_Chat_Assistant.py", title="Chat Assistant", icon="💬", default=True)
-about_page = st.Page("pages/3_About_Us.py", title="About Us", icon="ℹ️")
-methodology_page = st.Page("pages/4_Methodology.py", title="Methodology", icon="🔍")
-fee_register_page = st.Page("pages/5_Fee_Register.py", title="Fee Register", icon="📊")
+# ---------- Pages ----------
+chat_page = st.Page(
+    "pages/1_Chat_Assistant.py",
+    title="Chat Assistant",
+    icon="💬",
+    default=True,
+)
 
-pages = [chat_page, about_page, methodology_page, fee_register_page]
+pages = [chat_page]
 
-# ---------- Admin-only page: only added to the nav once logged in ----------
 if st.session_state.role == "Admin":
-    admin_page = st.Page("pages/2_Admin_Upload.py", title="Admin Upload", icon="📤")
+    admin_page = st.Page(
+        "pages/2_Admin_Upload.py",
+        title="Admin Upload",
+        icon="📤",
+    )
     pages.append(admin_page)
 
 pg = st.navigation(pages)
