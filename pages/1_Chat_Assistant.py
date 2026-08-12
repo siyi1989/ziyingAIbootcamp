@@ -14,11 +14,11 @@ st.title("💬 Vendors@Gov Billing Assistant")
 st.caption(
     "Ask about vendor billing. The assistant will suggest the most relevant "
     "organisation, department, customer code, or sub-business unit based on "
-    "the latest vendor registry indexed in Qdrant."
+    "the latest vendor registry"
 )
 
 st.write(
-    "Use this assistant when the correct billing division is unclear. "
+    "Use this assistant when you're unclear about the Customer code. "
     "The response is generated from the uploaded vendor registry and should "
     "be verified against the vendor's billing context before use."
 )
@@ -80,7 +80,7 @@ def format_metadata(meta):
 # ============================================================
 
 question = st.chat_input(
-    "Example: Vendor says this is for CAA Finance. Which customer code should I use?"
+    "Example: I want to bill CAA Finance. Which customer code should I use?"
 )
 
 
